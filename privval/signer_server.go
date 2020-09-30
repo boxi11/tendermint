@@ -2,6 +2,7 @@ package privval
 
 import (
 	"io"
+	"os"
 	"sync"
 
 	"github.com/tendermint/tendermint/libs/service"
@@ -63,6 +64,18 @@ func (ss *SignerServer) servicePendingRequest() {
 	}
 
 	req, err := ss.endpoint.ReadMessage()
+
+	ss.Logger.Debug("Serving", "msg", req)
+
+	if req == nil {
+		err = ss.Stop()
+		if err != nil {
+			panic(err)
+		}
+		ss.Logger.Error("Chain daemon stopped, going to stop SignerServer")
+		os.Exit(1)
+	}
+
 	if err != nil {
 		if err != io.EOF {
 			ss.Logger.Error("SignerServer: HandleMessage", "err", err)
@@ -96,6 +109,12 @@ func (ss *SignerServer) serviceLoop() {
 		default:
 			err := ss.endpoint.ensureConnection()
 			if err != nil {
+				err = ss.Stop()
+				if err != nil {
+					panic(err)
+				}
+				ss.Logger.Error("Max retries exceeded, going to stop SignerServer")
+				os.Exit(1)
 				return
 			}
 			ss.servicePendingRequest()
