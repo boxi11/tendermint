@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	defaultMaxDialRetries        = 10
-	defaultRetryWaitMilliseconds = 100
+	defaultMaxDialRetries        = 20
+	defaultRetryWaitMilliseconds = 500
 )
 
 // SignerServiceEndpointOption sets an optional parameter on the SignerDialerEndpoint.
@@ -48,12 +48,13 @@ type SignerDialerEndpoint struct {
 func NewSignerDialerEndpoint(
 	logger log.Logger,
 	dialer SocketDialer,
+	maxDialRetries int,
 ) *SignerDialerEndpoint {
 
 	sd := &SignerDialerEndpoint{
 		dialer:         dialer,
 		retryWait:      defaultRetryWaitMilliseconds * time.Millisecond,
-		maxConnRetries: defaultMaxDialRetries,
+		maxConnRetries: maxDialRetries,
 	}
 
 	sd.BaseService = *service.NewBaseService(logger, "SignerDialerEndpoint", sd)

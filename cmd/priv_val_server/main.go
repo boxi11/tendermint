@@ -16,9 +16,10 @@ import (
 func main() {
 	var (
 		addr             = flag.String("addr", ":26659", "Address of client to connect to")
-		chainID          = flag.String("chain-id", "mychain", "chain id")
+		chainID          = flag.String("chain-id", "shentu", "chain id")
 		privValKeyPath   = flag.String("priv-key", "", "priv val key file path")
 		privValStatePath = flag.String("priv-state", "", "priv val state file path")
+		maxDialRetries   = flag.Int("max-retry", 120, "max dial retires")
 
 		logger = log.NewTMLogger(
 			log.NewSyncWriter(os.Stdout),
@@ -32,6 +33,7 @@ func main() {
 		"chainID", *chainID,
 		"privKeyPath", *privValKeyPath,
 		"privStatePath", *privValStatePath,
+		"maxDialRetries", *maxDialRetries,
 	)
 
 	pv := privval.LoadFilePV(*privValKeyPath, *privValStatePath)
@@ -49,7 +51,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	sd := privval.NewSignerDialerEndpoint(logger, dialer)
+	sd := privval.NewSignerDialerEndpoint(logger, dialer, *maxDialRetries)
 	ss := privval.NewSignerServer(sd, *chainID, pv)
 
 	err := ss.Start()
