@@ -43,7 +43,14 @@ Verify that you have the latest version of Go installed:
 
 ```bash
 $ go version
-go version go1.15.1 darwin/amd64
+go version go1.14.x darwin/amd64
+```
+
+Make sure you have `$GOPATH` environment variable set:
+
+```bash
+echo $GOPATH
+/Users/melekes/go
 ```
 
 ## 1.2 Creating a new Go project
@@ -247,6 +254,7 @@ func (app *KVStoreApplication) BeginBlock(req abcitypes.RequestBeginBlock) abcit
 	app.currentBatch = app.db.NewTransaction(true)
 	return abcitypes.ResponseBeginBlock{}
 }
+
 ```
 
 Here we create a batch, which will store block's transactions.
@@ -436,35 +444,16 @@ dependency management.
 ```bash
 export GO111MODULE=on
 go mod init github.com/me/example
-```
-
-This should create a `go.mod` file. The current tutorial only works with
-tendermint > v0.34, so let's make sure we're using the latest version:
-
-```go
-module github.com/me/example
-
-go 1.15
-
-require (
-	github.com/dgraph-io/badger v1.6.2
-	github.com/tendermint/tendermint v0.34.0-rc4
-)
-```
-
-Now we can build the binary:
-
-```bash
 go build
 ```
+
+This should build the binary.
 
 To create a default configuration, nodeKey and private validator files, let's
 execute `tendermint init`. But before we do that, we will need to install
 Tendermint Core. Please refer to [the official
 guide](https://docs.tendermint.com/master/introduction/install.html). If you're
-installing from source, don't forget to checkout the latest release (`git
-checkout vX.Y.Z`). Don't forget to check that the application uses the same
-major version.
+installing from source, don't forget to checkout the latest release (`git checkout vX.Y.Z`).
 
 ```bash
 rm -rf /tmp/example
